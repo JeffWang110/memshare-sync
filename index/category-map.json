@@ -1,0 +1,90 @@
+{
+  "categories": [
+    {
+      "label": "財經投資",
+      "emoji": "📈",
+      "count": 40
+    },
+    {
+      "label": "地緣政治",
+      "emoji": "🌍",
+      "count": 2
+    },
+    {
+      "label": "人物 / 訪談",
+      "emoji": "👤",
+      "count": 8
+    },
+    {
+      "label": "教學指南 (For X)",
+      "emoji": "📚",
+      "count": 13
+    },
+    {
+      "label": "Claude 生態系",
+      "emoji": "📘",
+      "count": 17
+    },
+    {
+      "label": "MCP 協議",
+      "emoji": "🔗",
+      "count": 5
+    },
+    {
+      "label": "OpenClaw 生態系",
+      "emoji": "🐾",
+      "count": 22
+    },
+    {
+      "label": "記憶系統",
+      "emoji": "🧠",
+      "count": 5
+    },
+    {
+      "label": "模型 / 工具",
+      "emoji": "🛠",
+      "count": 13
+    },
+    {
+      "label": "通用 AI Agent",
+      "emoji": "🤖",
+      "count": 19
+    },
+    {
+      "label": "自我成長",
+      "emoji": "🌱",
+      "count": 6
+    },
+    {
+      "label": "宗教哲學",
+      "emoji": "🕉",
+      "count": 3
+    },
+    {
+      "label": "健康醫學",
+      "emoji": "⚕",
+      "count": 3
+    },
+    {
+      "label": "企業 / 資安",
+      "emoji": "🔒",
+      "count": 3
+    },
+    {
+      "label": "產業趨勢",
+      "emoji": "🏭",
+      "count": 1
+    },
+    {
+      "label": "組織經營",
+      "emoji": "🏢",
+      "count": 6
+    },
+    {
+      "label": "其他",
+      "emoji": "📝",
+      "count": 30
+    }
+  ],
+  "last_updated": "2026-06-27T20:46:45.230800"
+}

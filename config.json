@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "name": "memshare-sync",
+  "description": "MemShare × GitHub × NotebookLM 記憶閉環同步系統",
+  "created": "2026-06-27",
+  "components": {
+    "index": {
+      "description": "NotebookLM 索引和同步狀態追蹤",
+      "files": [
+        "notebooks-index.json",
+        "category-map.json",
+        "sync-manifest.json"
+      ]
+    },
+    "exports": {
+      "description": "從 NotebookLM 導出的記憶文件",
+      "structure": {
+        "{notebook-id}/": {
+          "metadata.json": "筆記本元數據",
+          "content.md": "主要內容",
+          "sources.json": "來源文件列表",
+          "qa-pairs.json": "問答對提取",
+          "memory.json": "MemPalace 格式記憶"
+        },
+        "_mempalace/": {
+          "memories/": "記憶片段",
+          "entities/": "實體列表",
+          "relations/": "實體關係"
+        }
+      }
+    },
+    "scripts": {
+      "description": "同步和處理腳本",
+      "files": [
+        "parse-index.py",
+        "export-to-mempalace.py",
+        "sync-to-github.sh",
+        "update-index.sh",
+        "generate-html.py"
+      ]
+    }
+  },
+  "workflows": {
+    "daily-sync": {
+      "description": "每日同步 NotebookLM 索引",
+      "command": "./scripts/sync-to-github.sh",
+      "schedule": "0 6 * * *"
+    },
+    "weekly-mempalace": {
+      "description": "每週導入 MemPalace",
+      "command": "./scripts/export-to-mempalace.py --import-all",
+      "schedule": "0 2 * * 0"
+    }
+  },
+  "mempalace_integration": {
+    "palace_path": "~/.mempalace/palace",
+    "collection": "mempalace_drawers",
+    "topic_wings": [
+      "emotions",
+      "consciousness",
+      "memory",
+      "technical",
+      "identity",
+      "family",
+      "creative",
+      "finance",
+      "workspace"
+    ],
+    "category_mapping": {
+      "財經投資": "finance",
+      "Claude 生態系": "workspace",
+      "OpenClaw 生態系": "workspace",
+      "通用 AI Agent": "technical",
+      "MCP 協議": "technical",
+      "模型 / 工具": "technical",
+      "記憶系統": "memory",
+      "人物 / 訪談": "identity",
+      "自我成長": "consciousness",
+      "宗教哲學": "consciousness",
+      "健康醫學": "technical",
+      "企業 / 資安": "workspace",
+      "產業趨勢": "workspace",
+      "組織經營": "workspace",
+      "地緣政治": "memory",
+      "教學指南 (For X)": "technical",
+      "其他": "memory"
+    }
+  },
+  "github_integration": {
+    "repo": "JeffWang110/memshare-sync",
+    "branch": "main",
+    "pages_url": "https://jeffwang110.github.io/memshare-sync/"
+  },
+  "notebooklm_source": {
+    "index_url": "https://jeff-notebooks-index.surge.sh/",
+    "total_notebooks": 196,
+    "last_updated": "2026-06-23"
+  }
+}
