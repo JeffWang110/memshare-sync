@@ -1,0 +1,162 @@
+name: MemShare Sync
+
+on:
+  schedule:
+    # 每天 UTC 22:00 (台灣時間 06:00)
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+    # 手動觸發
+    inputs:
+      sync_type:
+        description: '同步類型'
+        required: true
+        default: 'daily'
+        type: choice
+        options:
+          - daily
+          - full
+          - mempalace-only
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install chromadb openai requests
+      
+      - name: Parse NotebookLM Index
+        run: |
+          python scripts/parse-index.py --url "https://jeff-notebooks-index.surge.sh/" --output index/
+      
+      - name: Check for new notebooks
+        id: check-new
+        run: |
+          # 比對索引變化
+          python -c "
+          import json
+          from pathlib import Path
+          
+          # 讀取現有清單
+          manifest_path = Path('index/sync-manifest.json')
+          if manifest_path.exists():
+              with open(manifest_path) as f:
+                  manifest = json.load(f)
+              existing = set(manifest.get('notebooks', {}).keys())
+          else:
+              existing = set()
+          
+          # 讀取新索引
+          with open('index/notebooks-index.json') as f:
+              new_index = json.load(f)
+          new_ids = {nb['id'] for nb in new_index['notebooks']}
+          
+          # 找出新增的筆記本
+          added = new_ids - existing
+          
+          if added:
+              print(f'::set-output name=new_count::{len(added)}')
+              print(f'::set-output name=added::{json.dumps(list(added))}')
+          else:
+              print('::set-output name=new_count::0')
+          "
+      
+      - name: Sync to MemPalace (if new notebooks)
+        if: steps.check-new.outputs.new_count != '0'
+        run: |
+          echo "發現 ${{ steps.check-new.outputs.new_count }} 本新增筆記本"
+          # 未來可加入自動導入邏輯
+          # python scripts/export-to-mempalace.py --import-new
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "沒有變更需要提交"
+          else
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            git add .
+            git commit -m "sync: NotebookLM 索引更新 $TIMESTAMP"
+            git push
+          fi
+      
+      - name: Update sync manifest
+        run: |
+          python -c "
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          
+          # 讀取索引
+          with open('index/notebooks-index.json') as f:
+              index = json.load(f)
+          
+          # 更新清單
+          manifest_path = Path('index/sync-manifest.json')
+          if manifest_path.exists():
+              with open(manifest_path) as f:
+                  manifest = json.load(f)
+          else:
+              manifest = {'version': '1.0', 'notebooks': {}}
+          
+          # 更新同步時間
+          for nb in index['notebooks']:
+              if nb['id'] not in manifest['notebooks']:
+                  manifest['notebooks'][nb['id']] = {
+                      'title': nb['title'],
+                      'category': nb['category'],
+                      'created_at': nb.get('created_at', ''),
+                      'github_synced': True,
+                      'mempalace_synced': False,
+                      'last_sync': datetime.now().isoformat()
+                  }
+          
+          manifest['last_updated'] = datetime.now().isoformat()
+          
+          with open(manifest_path, 'w') as f:
+              json.dump(manifest, f, ensure_ascii=False, indent=2)
+          "
+      
+      - name: Generate status report
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          
+          # 讀取狀態
+          with open('index/sync-manifest.json') as f:
+              manifest = json.load(f)
+          
+          total = len(manifest['notebooks'])
+          github_synced = sum(1 for nb in manifest['notebooks'].values() if nb.get('github_synced'))
+          mempalace_synced = sum(1 for nb in manifest['notebooks'].values() if nb.get('mempalace_synced'))
+          
+          print(f'📊 同步狀態報告')
+          print(f'總筆記本: {total}')
+          print(f'GitHub 已同步: {github_synced}')
+          print(f'MemPalace 已同步: {mempalace_synced}')
+          "
+      
+      - name: Commit manifest update
+        run: |
+          if git diff --quiet index/sync-manifest.json; then
+            echo "清單無變化"
+          else
+            git add index/sync-manifest.json
+            git commit -m "chore: 更新同步清單"
+            git push
+          fi
