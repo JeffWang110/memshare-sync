@@ -2,8 +2,8 @@ name: MemShare Sync
 
 on:
   schedule:
-    # 每天 UTC 22:00 (台灣時間 06:00)
-    - cron: '0 22 * * *'
+    # 每週一 UTC 22:00 (台灣時間週二 06:00)
+    - cron: '0 22 * * 1'
   workflow_dispatch:
     # 手動觸發
     inputs:
