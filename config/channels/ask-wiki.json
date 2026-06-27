@@ -1,0 +1,46 @@
+{
+  "channel_id": "1520459710778835014",
+  "channel_name": "ask-wiki",
+  "purpose": "筆記本知識查詢頻道",
+  "created": "2026-06-27",
+  "behavior": {
+    "auto_search": true,
+    "search_sources": [
+      "mempalace",
+      "notebooklm-index"
+    ],
+    "response_style": "structured",
+    "fallback_to_web": true
+  },
+  "triggers": {
+    "keywords": [],
+    "prefix": null,
+    "always_active": true
+  },
+  "integration": {
+    "mempalace_wings": [
+      "finance",
+      "workspace",
+      "technical",
+      "memory",
+      "identity",
+      "consciousness"
+    ],
+    "notebooklm_index": "https://jeff-notebooks-index.surge.sh/",
+    "search_script": "~/github-pages-repos/memshare-sync/scripts/memshare-search.py"
+  },
+  "examples": [
+    {
+      "query": "Claude Code 怎麼用？",
+      "action": "搜尋 MemPalace workspace wing + NotebookLM Claude 生態系分類"
+    },
+    {
+      "query": "台股投資策略",
+      "action": "搜尋 MemPalace finance wing + NotebookLM 財經投資分類"
+    },
+    {
+      "query": "什麼是 MCP 協議？",
+      "action": "搜尋 MemPalace technical wing + NotebookLM MCP 協議分類"
+    }
+  ]
+}
