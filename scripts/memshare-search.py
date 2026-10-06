@@ -16,6 +16,8 @@ MP_PYTHON = "/home/kraft110/.local/share/uv/tools/mempalace/bin/python3"
 
 def load_notebooks_index(index_path: str = "index/notebooks-index.json") -> Dict:
     """載入 NotebookLM 索引"""
+    if index_path is None:
+        index_path = "index/notebooks-index.json"
     path = Path(index_path)
     if not path.exists():
         # 嘗試從 repo 目錄載入
